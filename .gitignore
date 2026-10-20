@@ -1,0 +1,7 @@
+node_modules
+.env
+.vercel
+.output
+.nitro
+src/routeTree.gen.ts
+__pycache__
