@@ -112,7 +112,6 @@ body {
 }
 
 .nav-links a,
-.foot-links button,
 .side-nav button {
   background: none;
   border: 0;
@@ -122,8 +121,7 @@ body {
   font-weight: 500;
 }
 
-.nav-links a:hover,
-.foot-links button:hover { color: var(--ink); }
+.nav-links a:hover { color: var(--ink); }
 
 .nav-toggle {
   display: none;
@@ -792,7 +790,8 @@ textarea { min-height: 96px; resize: vertical; }
 .desk {
   display: grid;
   grid-template-columns: 220px 1fr;
-  min-height: calc(100vh - 78px);
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--paper);
 }
 
@@ -945,21 +944,17 @@ tr.is-active td { background: var(--mint-2); }
 .queue-card p { color: var(--muted); margin-top: 4px; }
 
 .foot {
-  width: min(1120px, calc(100% - 32px));
+  width: min(1180px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 28px 0 40px;
+  padding: 38px 0 72px;
   display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  border-top: 1px solid var(--line);
+  gap: 24px;
   align-items: center;
 }
 
-.foot-logo { display: block; width: 166px; height: auto; margin-bottom: 6px; }
+.foot-logo { display: block; width: min(320px, 38%); height: auto; }
 
-.foot p { color: var(--muted); margin-top: 4px; max-width: 460px; }
-.foot-links { display: flex; gap: 8px 16px; align-items: center; }
-
+.foot p { color: var(--muted); max-width: 900px; font-size: clamp(1.1rem, 2.2vw, 1.75rem); }
 .toast {
   position: fixed;
   left: 50%;
@@ -1018,7 +1013,8 @@ body:has(#view-staff:not([hidden])) .nav { display: none; }
   .side { position: sticky; top: 0; z-index: 15; }
   .side-nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
   .side-nav button { white-space: nowrap; }
-  .form-bar, .review-actions, .foot { flex-direction: column; align-items: stretch; }
+  .form-bar, .review-actions { flex-direction: column; align-items: stretch; }
+  .foot { flex-direction: column; align-items: flex-start; }
   .scan-stage { grid-template-columns: 1fr; min-height: 0; }
   .hero { padding: 30px 24px; margin-top: 16px; }
   .hero-photo { transform: none; }
