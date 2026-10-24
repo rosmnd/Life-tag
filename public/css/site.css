@@ -125,6 +125,8 @@ body {
 .nav-links a:hover,
 .foot-links button:hover { color: var(--ink); }
 
+.foot-links { display: flex; gap: 8px 16px; align-items: center; }
+
 .nav-toggle {
   display: none;
   width: 44px;
@@ -829,7 +831,8 @@ textarea { min-height: 96px; resize: vertical; }
 .desk {
   display: grid;
   grid-template-columns: 220px 1fr;
-  min-height: calc(100vh - 78px);
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--paper);
 }
 
@@ -982,21 +985,17 @@ tr.is-active td { background: var(--mint-2); }
 .queue-card p { color: var(--muted); margin-top: 4px; }
 
 .foot {
-  width: min(1120px, calc(100% - 32px));
+  width: min(1180px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 28px 0 40px;
+  padding: 38px 0 72px;
   display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  border-top: 1px solid var(--line);
+  gap: 24px;
   align-items: center;
 }
 
-.foot-logo { display: block; width: 166px; height: auto; margin-bottom: 6px; }
+.foot-logo { display: block; width: min(320px, 38%); height: auto; }
 
-.foot p { color: var(--muted); margin-top: 4px; max-width: 460px; }
-.foot-links { display: flex; gap: 8px 16px; align-items: center; }
-
+.foot p { color: var(--muted); max-width: 900px; font-size: clamp(1.1rem, 2.2vw, 1.75rem); }
 .toast {
   position: fixed;
   left: 50%;
