@@ -1,7 +1,6 @@
 (function () {
   "use strict";
 
-  var TOKEN_KEY = "lifetag.staff-token";
   var CHIP = 144;
   var MAX_PROFILE_BYTES = 120;
   var buildPayload = null;
@@ -16,37 +15,36 @@
     orders: ["Order records", "Chief Operating & Procurement Manager"],
     payload: ["NDEF payload", "Plain text · no app or internet needed"],
     production: ["Substrate prep", "Sanitize, print, laminate, pack"],
-    encoding: ["Write to NTAG213", "Web NFC on Android, or the desktop encoder"],
-    qc: ["Offline quality control", "Test phone · Airplane Mode"],
+    qc: ["Order quality control", "Verify profile, product, and order details"],
     dispatch: ["Order dispatch", "Ship or hand off"],
-    support: ["Support", "Re-encoding requests"]
+    support: ["Customer support", "Review and manage customer inquiries"],
   };
 
   var orders = [];
+  var supportTickets = [];
   var activeId = "001";
   var product = "duo";
   var scanId = "001";
   var panel = "orders";
   var serverMode = false;
-  var encodeAbort = null;
   var toastTimer = null;
 
   function blankSteps() {
     return {
       sanitize: false, print: false, laminate: false, pack: false, prepDone: false,
-      airplane: false, tap: false, text: false, offline: false,
-      encoded: false, qc: false, shipped: false, generated: false
+      qcProfile: false, qcProduct: false, qcPackage: false, qcOrder: false,
+      qc: false, shipped: false, generated: false
     };
   }
 
-  function staffToken() {
-    try { return sessionStorage.getItem(TOKEN_KEY) || ""; } catch { return ""; }
-  }
-
-  function api(path, method, body, token) {
+  function api(path, method, body) {
     var headers = { "content-type": "application/json" };
-    if (token) headers.authorization = "Bearer " + token;
-    return fetch(path, { method: method || "GET", headers: headers, body: body ? JSON.stringify(body) : undefined })
+    return fetch(path, {
+      method: method || "GET",
+      headers: headers,
+      credentials: "same-origin",
+      body: body ? JSON.stringify(body) : undefined
+    })
       .then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (data) {
           if (!res.ok) {
@@ -70,7 +68,7 @@
      database is the source of truth and nothing is cached locally. */
   function save(order, patch, successMessage) {
     if (!serverMode || !order) return Promise.resolve(false);
-    return api("/api/orders/" + encodeURIComponent(order.id), "PATCH", patch, staffToken())
+    return api("/api/orders/" + encodeURIComponent(order.id), "PATCH", patch)
       .then(function (updated) {
         var index = orders.findIndex(function (item) { return item.id === updated.id; });
         if (index !== -1) orders[index] = normalize(updated);
@@ -79,23 +77,21 @@
         return true;
       })
       .catch(function (err) {
+        if (err.status === 401) {
+          serverMode = false;
+          orders = [];
+          activeId = "";
+          renderConnect("Your staff session expired. Please log in again.");
+          return false;
+        }
         toast("Not saved to server: " + err.message);
         return false;
       });
   }
 
   function pullOrders() {
-    var token = staffToken();
-    if (!token) {
-      serverMode = false;
-      orders = [];
-      renderConnect("");
-      return Promise.resolve(false);
-    }
-    serverMode = false;
-    orders = [];
-    renderConnect("");
-    return api("/api/orders", "GET", null, token).then(function (data) {
+    var wasConnected = serverMode;
+    return api("/api/orders", "GET").then(function (data) {
       serverMode = true;
       orders = (data.orders || []).map(normalize);
       if (!byId(activeId)) activeId = orders[0] ? orders[0].id : "";
@@ -103,6 +99,17 @@
       renderDesk();
       return true;
     }).catch(function (err) {
+      if (err.status === 401) {
+        serverMode = false;
+        orders = [];
+        activeId = "";
+        renderConnect("Your staff session expired. Please log in again.");
+        return false;
+      }
+      if (wasConnected) {
+        toast("Could not refresh orders: " + err.message);
+        return false;
+      }
       serverMode = false;
       orders = [];
       activeId = "";
@@ -114,6 +121,8 @@
   function renderConnect(error) {
     var form = $("staff-form"), status = $("staff-status"), content = $("staff-content");
     if (!form) return;
+    var login = document.querySelector(".staff-login-wrap");
+    if (login) login.hidden = serverMode;
     form.hidden = serverMode;
     if (content) content.hidden = !serverMode;
     status.textContent = error || "";
@@ -158,7 +167,6 @@
 
   function statusLabel(order) {
     if (order.status === "awaiting_payment") return ["Awaiting payment", "status-new"];
-    if (order.reencode) return ["Re-encode", "status-reencode"];
     if (order.steps && order.steps.shipped) return ["Shipped", "status-shipped"];
     if (order.status === "new") return ["New", "status-new"];
     if (order.steps && order.steps.qc) return ["QC pass", "status-paid"];
@@ -183,6 +191,8 @@
       var el = $(view);
       if (el) el.hidden = view !== id;
     });
+    var staffLink = $("staff-footer-link");
+    if (staffLink) staffLink.hidden = id !== "view-home";
     var links = $("nav-links");
     if (links) links.classList.remove("is-open");
     var toggle = document.querySelector("[data-action='nav-toggle']");
@@ -286,7 +296,6 @@
       allergies: draft.allergies,
       directives: draft.directives,
       tracking: "",
-      reencode: null,
       steps: blankSteps(),
       created: new Date().toISOString().slice(0, 10)
     };
@@ -440,6 +449,51 @@
     }).join("");
   }
 
+  function renderSupportTickets() {
+    var body = $("support-ticket-rows");
+    var empty = $("support-ticket-empty");
+    if (!body || !empty) return;
+    body.innerHTML = supportTickets.map(function (ticket) {
+      var opened = new Date(ticket.created);
+      var dateLabel = Number.isNaN(opened.getTime()) ? ticket.created : opened.toLocaleString();
+      var isOpen = ticket.status === "open";
+      return "<tr>" +
+        "<td>" + esc(dateLabel) + "</td>" +
+        "<td>" + (ticket.category === "reencode" ? "RE-ENCODE" : "General") + "</td>" +
+        "<td><strong>" + esc(ticket.name) + "</strong><br><a href=\"mailto:" + esc(ticket.email) + "\">" + esc(ticket.email) + "</a></td>" +
+        "<td>" + esc(ticket.order_id || "—") + "</td>" +
+        "<td class=\"ticket-message\">" + esc(ticket.message) + "</td>" +
+        "<td><span class=\"status " + (isOpen ? "status-new" : "status-paid") + "\">" + (isOpen ? "Open" : "Resolved") + "</span></td>" +
+        "<td><button class=\"btn btn-ghost\" type=\"button\" data-action=\"support-ticket-status\" data-id=\"" +
+        esc(ticket.id) + "\" data-status=\"" + (isOpen ? "resolved" : "open") + "\">" +
+        (isOpen ? "Mark resolved" : "Reopen") + "</button></td>" +
+        "</tr>";
+    }).join("");
+    empty.hidden = supportTickets.length > 0;
+  }
+
+  function pullSupportTickets() {
+    var status = $("support-ticket-status");
+    if (status) status.textContent = "Loading inquiries…";
+    return api("/api/support/tickets", "GET").then(function (data) {
+      supportTickets = data.tickets || [];
+      if (status) status.textContent = "";
+      renderSupportTickets();
+      return true;
+    }).catch(function (err) {
+      if (err.status === 401) {
+        serverMode = false;
+        orders = [];
+        supportTickets = [];
+        activeId = "";
+        renderConnect("Your staff session expired. Please log in again.");
+        return false;
+      }
+      if (status) status.textContent = "Could not load inquiries: " + err.message;
+      return false;
+    });
+  }
+
   function syncChecks(rootId, order) {
     var root = $(rootId);
     if (!root || !order) return;
@@ -459,14 +513,14 @@
     document.querySelectorAll(".side-nav button").forEach(function (button) {
       button.classList.toggle("is-on", button.getAttribute("data-panel") === panel);
     });
-    ["orders", "payload", "production", "encoding", "qc", "dispatch", "support"].forEach(function (name) {
+    ["orders", "payload", "production", "qc", "dispatch", "support"].forEach(function (name) {
       $("panel-" + name).hidden = name !== panel;
     });
     if (!order) {
       $("working").textContent = "No orders yet.";
-      $("staff-empty-state").hidden = false;
+      $("staff-empty-state").hidden = panel === "support";
       document.querySelectorAll("#panel-payload [data-action], #panel-production [data-action], #prod-checks [data-step], " +
-        "#panel-encoding [data-action], #qc-checks [data-step], #panel-qc [data-action], " +
+        "#qc-checks [data-step], #panel-qc [data-action], " +
         "#panel-dispatch [data-action], #ship-note")
         .forEach(function (control) { control.disabled = true; });
       var emptyGate = $("payment-gate");
@@ -482,7 +536,7 @@
     if (gate) gate.hidden = paid;
     document.querySelectorAll("#panel-payload [data-action], #panel-production [data-action], " +
       "#prod-checks [data-step], " +
-      "#panel-encoding [data-action='write-chip'], #qc-checks [data-step], " +
+      "#qc-checks [data-step], " +
       "#panel-qc [data-action='approve-qc'], #panel-dispatch [data-action='mark-shipped']")
       .forEach(function (control) {
         control.disabled = control.closest("#panel-payload") ? false : !paid;
@@ -494,26 +548,11 @@
     var text = payload(order);
     $("payload-kicker").textContent = "Order #" + order.id + " · " + PRODUCTS[order.product].name;
     $("payload-pre").textContent = order.steps.generated ? text : "Generate the plain-text payload for this order.";
-    $("payload-meta").textContent = "Plain text · Profile: " + bytes(text) + " / " + MAX_PROFILE_BYTES + " bytes · NTAG213: " + CHIP + " bytes";
+    $("payload-meta").textContent = "Plain text · Profile: " + bytes(text) + " / " + MAX_PROFILE_BYTES + " bytes";
     $("prod-kicker").textContent = "Order #" + order.id;
     syncChecks("prod-checks", order);
     syncChecks("qc-checks", order);
     $("pass-pill").hidden = !order.steps.qc;
-    $("encode-meta").textContent = "Profile: " + bytes(text) + " / " + MAX_PROFILE_BYTES + " bytes · NTAG213 capacity: " + CHIP + " bytes";
-    if (!encodeAbort) {
-      $("encode-bar").style.width = order.steps.encoded ? "100%" : "0%";
-      $("encode-label").classList.remove("is-error");
-      $("encode-label").textContent = order.steps.encoded
-        ? "Payload written and verified." + (order.tagUid ? " Tag " + order.tagUid + "." : "")
-        : "Ready to write.";
-    }
-    var support = $("encode-support");
-    if (support) {
-      support.textContent = nfcSupported()
-        ? "This device can write NFC tags."
-        : "This device cannot write NFC tags from the browser. Open this page in Chrome on Android, or use the desktop encoder.";
-      support.classList.toggle("is-warn", !nfcSupported());
-    }
     $("ship-kicker").textContent = "Order #" + order.id;
     $("ship-facts").innerHTML =
       "<div><dt>Item</dt><dd>" + esc(PRODUCTS[order.product].item) + "</dd></div>" +
@@ -523,14 +562,6 @@
       "<div><dt>Hand-off</dt><dd>" + esc(order.tracking || "Courier · pending") + "</dd></div>";
     $("ship-note").value = order.tracking || "";
 
-    var queue = $("re-queue");
-    var requests = orders.filter(function (item) { return item.reencode; });
-    queue.innerHTML = requests.length
-      ? requests.map(function (item) {
-          return "<article class=\"queue-card\"><strong>#" + esc(item.id) + " · " + esc(item.buyer) + "</strong><p>" +
-            esc(item.reencode.option) + "</p><p>Bring the physical tag to 12-B Alcalde Jose, Pasig.</p></article>";
-        }).join("")
-      : "<p class=\"hint\">No re-encoding requests yet.</p>";
   }
 
   function onToggle(event) {
@@ -597,6 +628,7 @@
     if (action === "staff-panel") {
       panel = el.getAttribute("data-panel");
       renderDesk();
+      if (panel === "support") pullSupportTickets();
       return;
     }
     if (action === "open-order") {
@@ -611,7 +643,7 @@
         toast("A payment reference is required before marking this order paid.");
         return;
       }
-      api("/api/orders/" + encodeURIComponent(paid.id), "PATCH", { status: "paid" }, staffToken())
+      api("/api/orders/" + encodeURIComponent(paid.id), "PATCH", { status: "paid" })
         .then(function (updated) {
           var index = orders.findIndex(function (item) { return item.id === updated.id; });
           if (index !== -1) orders[index] = normalize(updated);
@@ -643,14 +675,14 @@
       if (!order) return;
       var step = el.getAttribute("data-step");
       if (order.status !== "paid" &&
-          ["sanitize", "print", "laminate", "pack", "airplane", "tap", "text", "offline"].indexOf(step) !== -1) {
+          ["sanitize", "print", "laminate", "pack", "qcProfile", "qcProduct", "qcPackage", "qcOrder"].indexOf(step) !== -1) {
         toast("Mark the order paid before starting production.");
         return;
       }
       var next = !order.steps[step];
       var stepPatch = { steps: {} };
       stepPatch.steps[step] = next;
-      if (step === "airplane" || step === "tap" || step === "text" || step === "offline") {
+      if (step.indexOf("qc") === 0) {
         stepPatch.steps.qc = false;
       }
       save(order, stepPatch);
@@ -666,42 +698,60 @@
       }
       save(prep, { steps: { prepDone: true } }, "Substrate prep marked done.").then(function (saved) {
         if (!saved) return;
-        panel = "encoding";
+        panel = "qc";
         renderDesk();
       });
-      return;
-    }
-    if (action === "write-chip") {
-      writeChipNfc();
-      return;
-    }
-    if (action === "cancel-write") {
-      if (encodeAbort) encodeAbort.abort();
       return;
     }
     if (action === "staff-refresh") {
       pullOrders().then(function (ok) { if (ok) toast("Orders refreshed."); });
       return;
     }
+    if (action === "staff-refresh-support") {
+      pullSupportTickets().then(function (ok) { if (ok) toast("Inquiries refreshed."); });
+      return;
+    }
+    if (action === "support-ticket-status") {
+      var ticketId = el.getAttribute("data-id");
+      var ticketStatus = el.getAttribute("data-status");
+      api("/api/support/tickets/" + encodeURIComponent(ticketId), "PATCH", { status: ticketStatus })
+        .then(function (result) {
+          var index = supportTickets.findIndex(function (ticket) { return ticket.id === result.ticket.id; });
+          if (index !== -1) supportTickets[index] = result.ticket;
+          renderSupportTickets();
+          toast(ticketStatus === "resolved" ? "Inquiry marked resolved." : "Inquiry reopened.");
+        })
+        .catch(function (err) {
+          if (err.status === 401) {
+            serverMode = false;
+            orders = [];
+            supportTickets = [];
+            activeId = "";
+            renderConnect("Your staff session expired. Please log in again.");
+          } else {
+            toast("Could not update inquiry: " + err.message);
+          }
+        });
+      return;
+    }
     if (action === "staff-disconnect") {
-      try {
-        sessionStorage.removeItem(TOKEN_KEY);
-      } catch {
-        toast("Could not clear the staff token from this tab.");
-        return;
-      }
-      serverMode = false;
-      orders = [];
-      activeId = "";
-      renderConnect("");
+      api("/api/auth/logout", "POST", {}).then(function () {
+        serverMode = false;
+        orders = [];
+        activeId = "";
+        renderConnect("");
+      }).catch(function (err) {
+        toast("Could not log out: " + err.message);
+      });
       return;
     }
     if (action === "approve-qc") {
       var qcOrder = active();
       if (!qcOrder) return;
       if (qcOrder.status !== "paid") { toast("Mark the order paid before starting QC."); return; }
-      if (!qcOrder.steps.airplane || !qcOrder.steps.tap || !qcOrder.steps.text || !qcOrder.steps.offline) {
-        toast("Complete the airplane-mode checks first.");
+      if (!qcOrder.steps.qcProfile || !qcOrder.steps.qcProduct ||
+          !qcOrder.steps.qcPackage || !qcOrder.steps.qcOrder) {
+        toast("Complete every order quality check first.");
         return;
       }
       save(qcOrder, { steps: { qc: true } }, "QC passed.").then(function (saved) {
@@ -725,121 +775,6 @@
     }
   }
 
-  function nfcSupported() {
-    return "NDEFReader" in window && window.isSecureContext;
-  }
-
-  function setEncode(message, percent, isError) {
-    var label = $("encode-label");
-    label.textContent = message;
-    label.classList.toggle("is-error", !!isError);
-    $("encode-bar").style.width = percent + "%";
-  }
-
-  function setWriting(on) {
-    var go = document.querySelector("[data-action='write-chip']");
-    var stop = document.querySelector("[data-action='cancel-write']");
-    if (go) go.disabled = on;
-    if (stop) stop.hidden = !on;
-  }
-
-  /* After a write, wait for the tag to be read back and compare it to what we sent. */
-  function verifyTag(ndef, expected, signal) {
-    return new Promise(function (resolve, reject) {
-      var timer = setTimeout(function () { reject(new Error("verify-timeout")); }, 15000);
-      ndef.onreading = function (event) {
-        clearTimeout(timer);
-        var record = event.message.records.filter(function (r) { return r.recordType === "text"; })[0];
-        var got = record ? new TextDecoder(record.encoding || "utf-8").decode(record.data) : "";
-        if (got === expected) resolve(event.serialNumber || "");
-        else reject(new Error("verify-mismatch"));
-      };
-      ndef.onreadingerror = function () {
-        clearTimeout(timer);
-        reject(new Error("verify-read"));
-      };
-      ndef.scan({ signal: signal }).catch(function (err) {
-        clearTimeout(timer);
-        reject(err);
-      });
-    });
-  }
-
-  function writeChipNfc() {
-    var order = active();
-    if (!order) return;
-    if (order.status !== "paid") { toast("Mark the order paid before encoding."); return; }
-    if (!order.steps.prepDone) { toast("Finish substrate prep first."); return; }
-    var text = payload(order);
-    if (bytes(text) > MAX_PROFILE_BYTES) { setEncode("Profile exceeds the safe 120-byte NTAG213 limit.", 0, true); return; }
-    if (!nfcSupported()) {
-      setEncode("Web NFC needs Chrome on Android over HTTPS. Use the desktop encoder instead.", 0, true);
-      return;
-    }
-
-    var lock = $("encode-lock") && $("encode-lock").checked;
-    var controller = new AbortController();
-    encodeAbort = controller;
-    setWriting(true);
-    setEncode("Hold a blank tag to the back of this phone…", 25);
-
-    var ndef = new window.NDEFReader();
-    var uid = "";
-    ndef.write({ records: [{ recordType: "text", data: text, lang: "en" }] }, { overwrite: true, signal: controller.signal })
-      .then(function () {
-        setEncode("Written. Verifying — keep the tag there, or tap it again.", 60);
-        return verifyTag(ndef, text, controller.signal);
-      })
-      .then(function (serial) {
-        uid = serial;
-        if (!lock) return null;
-        setEncode("Verified. Locking tag…", 85);
-        return ndef.makeReadOnly({ signal: controller.signal });
-      })
-      .then(function () {
-        if (serverMode) {
-          return api("/api/encoder/" + encodeURIComponent(order.id) + "/result", "POST",
-            { verified: true, via: "web-nfc", uid: uid || null }, staffToken())
-            .then(function () {
-              order.steps.encoded = true;
-              order.steps.generated = true;
-              order.tagUid = uid;
-              return null;
-            });
-        }
-        order.steps.encoded = true;
-        order.steps.generated = true;
-        order.tagUid = uid;
-        return null;
-      })
-      .then(function () {
-        setEncode("Payload written and verified.", 100);
-        toast("Order #" + order.id + " encoded" + (uid ? " · tag " + uid : "") + ".");
-        renderDesk();
-      })
-      .catch(function (err) {
-        order.steps.encoded = false;
-        var name = err && err.name;
-        var message = err && err.message;
-        if (name === "AbortError") message = "Write cancelled.";
-        else if (name === "NotAllowedError") message = "NFC permission was denied. Allow NFC for this site and try again.";
-        else if (name === "NotSupportedError") message = "This phone has NFC off or does not support it.";
-        else if (name === "NetworkError") message = "The tag moved away or is not writable. Try again.";
-        else if (message === "verify-timeout") message = "Written, but not verified. Tap the tag again, then press Write once more.";
-        else if (message === "verify-mismatch") message = "Read-back did not match. Do not ship this tag; write it again.";
-        else if (message === "verify-read") message = "Could not read the tag back. Try again.";
-        setEncode(message || "Write failed.", 0, true);
-        renderDesk();
-        $("encode-label").textContent = message || "Write failed.";
-        $("encode-label").classList.add("is-error");
-      })
-      .then(function () {
-        controller.abort();
-        encodeAbort = null;
-        setWriting(false);
-      });
-  }
-
   function handleSubmit(event) {
     var form = event.target;
     if (form.id === "step-form") {
@@ -859,38 +794,34 @@
     }
     if (form.id === "staff-form") {
       event.preventDefault();
-      var entered = $("staff-token").value.trim();
-      if (!entered) { renderConnect("Enter the staff token."); return; }
-      try {
-        sessionStorage.setItem(TOKEN_KEY, entered);
-      } catch {
-        renderConnect("Session storage is unavailable; the staff token cannot be kept for this tab.");
-        return;
-      }
-      pullOrders().then(function (ok) {
-        if (ok) $("staff-token").value = "";
+      var username = $("staff-username").value.trim();
+      var password = $("staff-password").value;
+      $("staff-password").value = "";
+      if (!username || !password) { renderConnect("Enter your username and password."); return; }
+      api("/api/auth/login", "POST", { username: username, password: password }).then(function () {
+        return pullOrders();
+      }).then(function (ok) {
+        if (!ok) renderConnect("Unable to load the staff desk. Please try again.");
+      }).catch(function (err) {
+        renderConnect(err.message);
       });
       return;
     }
-    if (form.id === "reencode-form") {
+    if (form.id === "support-inquiry-form") {
       event.preventDefault();
-      var id = $("re-id").value.trim().replace(/^#/, "");
-      while (id.length < 3 && /^\d+$/.test(id)) id = "0" + id;
-      var reError = $("re-error");
-      var reOk = $("re-ok");
-      var request = {
-        receipt: $("re-receipt").value.trim(),
-        option: $("re-option").value
-      };
-      api("/api/orders/" + encodeURIComponent(id) + "/reencode", "POST", request).then(function () {
-        reError.hidden = true;
-        reOk.hidden = false;
-        reOk.textContent = "Request saved for #" + id + ". Bring the physical tag to 12-B Alcalde Jose, Pasig. Fee ₱20–₱30.";
+      var inquiryStatus = $("support-inquiry-status");
+      inquiryStatus.textContent = "Sending inquiry…";
+      api("/api/support/tickets", "POST", {
+        category: $("support-category").value,
+        name: $("support-name").value.trim(),
+        email: $("support-email").value.trim(),
+        orderId: $("support-order-id").value.trim(),
+        message: $("support-message").value.trim()
+      }).then(function () {
         form.reset();
+        inquiryStatus.textContent = "Your inquiry was sent. Our support team will follow up by email.";
       }).catch(function (err) {
-        reError.hidden = false;
-        reError.textContent = err.status === 404 ? "No order #" + id + " found." : err.message;
-        reOk.hidden = true;
+        inquiryStatus.textContent = "Could not send your inquiry: " + err.message;
       });
       return;
     }
@@ -930,10 +861,8 @@
         var steps = [
           ["generated", "Payload generated"],
           ["prepDone", "Production prepared"],
-          ["encoded", "Tag encoded"],
           ["qc", "Quality checked"],
-          ["shipped", "Shipped"],
-          ["reencodeRequested", "Re-encoding requested"]
+          ["shipped", "Shipped"]
         ];
         trackStatus.innerHTML =
           "<div><dt>Product</dt><dd>" + esc(PRODUCTS[result.product] ? PRODUCTS[result.product].name : result.product) + "</dd></div>" +
@@ -1010,14 +939,13 @@
     if (event.target && event.target.id === "terms-check") {
       $("terms-continue").disabled = !event.target.checked;
     }
-    if (event.target && (event.target.id === "track-id" || event.target.id === "re-id")) {
+    if (event.target && event.target.id === "track-id") {
       try {
-        var isTrackField = event.target.id === "track-id";
         var receiptId = event.target.value.trim().replace(/^#/, "");
         while (receiptId.length < 3 && /^\d+$/.test(receiptId)) receiptId = "0" + receiptId;
-        var receiptField = $(isTrackField ? "track-receipt" : "re-receipt");
+        var receiptField = $("track-receipt");
         receiptField.value = localStorage.getItem("lifetag.receipt." + receiptId) || "";
-        if (isTrackField && !receiptField.value && receiptId.indexOf("LOCAL-") === 0) {
+        if (!receiptField.value && receiptId.indexOf("LOCAL-") === 0) {
           var localCopy = JSON.parse(localStorage.getItem("lifetag.order." + receiptId) || "null");
           if (localCopy) receiptField.value = localCopy.receipt || "";
         }
@@ -1056,8 +984,7 @@
       orders = [];
       activeId = "";
       panel = "orders";
-      renderConnect("");
-      if (staffToken()) pullOrders();
+      pullOrders();
       return;
     }
 

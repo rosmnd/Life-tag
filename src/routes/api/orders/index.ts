@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { NewOrder, createOrder, listOrders, toClient } from "@/lib/orders.server";
 import { ORDER_VALIDATION_MESSAGES, validateOrderProfile } from "@/lib/order-validation";
-import { json, requireToken, tooMany } from "@/lib/staff-token.server";
+import { json, requireStaffSession, tooMany } from "@/lib/auth.server";
 
 export const Route = createFileRoute("/api/orders/")({
   server: {
     handlers: {
-      // Fulfillment desk: all orders (staff token).
+      // Fulfillment desk: all orders (staff session).
       GET: async ({ request }) => {
-        const denied = requireToken(request, ["staff"]);
+        const denied = requireStaffSession(request);
         if (denied) return denied;
         const rows = await listOrders();
         return json(200, { orders: rows.map(toClient) });

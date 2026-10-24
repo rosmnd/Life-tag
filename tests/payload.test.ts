@@ -4,7 +4,7 @@ import { MAX_PAYLOAD_BYTES, payloadBytes, payloadOf } from "../src/lib/payload.t
 import { ORDER_VALIDATION_MESSAGES, validateOrderProfile } from "../src/lib/order-validation.ts";
 import { orderStepPatchError } from "../src/lib/order-steps.ts";
 
-test("payload matches the format the site and encoder use", () => {
+test("payload matches the format displayed by the site", () => {
   const text = payloadOf({ buyer: "Dela Cruz, Juan", blood: "O+", ice: "09171234567", allergies: "Penicillin" });
   assert.equal(
     text,
@@ -102,28 +102,19 @@ test("preparation cannot be completed before all paid production checks", () => 
   assert.match(orderStepPatchError("paid", { ...ready, prepDone: true }, { status: "awaiting_payment" }) ?? "", /paid/);
 });
 
-test("PATCH cannot set encoded; only verified encoder results may record it", () => {
-  assert.match(orderStepPatchError("paid", {}, { steps: { encoded: true } }) ?? "", /verified encoder result/);
-  assert.equal(orderStepPatchError("paid", { encoded: true }, { steps: { encoded: false } }), null);
-});
-
-test("QC requires encoding and all four checks", () => {
-  const checks = { airplane: true, tap: true, text: true, offline: true };
-  assert.match(orderStepPatchError("paid", checks, { steps: { qc: true } }) ?? "", /Encode the tag/);
-  assert.match(orderStepPatchError("paid", { encoded: true, airplane: true, tap: true, text: true }, {
-    steps: { qc: true },
-  }) ?? "", /all QC checks/);
-  assert.equal(orderStepPatchError("paid", { encoded: true, ...checks }, { steps: { qc: true } }), null);
+test("QC requires all four order quality checks", () => {
+  const checks = { qcProfile: true, qcProduct: true, qcPackage: true, qcOrder: true };
+  assert.match(orderStepPatchError("paid", {}, { steps: { qc: true } }) ?? "", /all order quality checks/);
+  assert.equal(orderStepPatchError("paid", checks, { steps: { qc: true } }), null);
 });
 
 test("shipping requires QC approval", () => {
   assert.match(orderStepPatchError("paid", {}, { steps: { shipped: true } }) ?? "", /Approve QC/);
   assert.equal(orderStepPatchError("paid", {
-    encoded: true,
-    airplane: true,
-    tap: true,
-    text: true,
-    offline: true,
+    qcProfile: true,
+    qcProduct: true,
+    qcPackage: true,
+    qcOrder: true,
     qc: true,
   }, { steps: { shipped: true } }), null);
 });

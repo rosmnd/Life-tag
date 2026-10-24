@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { json } from "@/lib/staff-token.server";
+import { json } from "@/lib/auth.server";
 
 export const Route = createFileRoute("/api/payment-instructions")({
   server: {

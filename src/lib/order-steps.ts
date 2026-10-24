@@ -11,13 +11,10 @@ export function orderStepPatchError(
   patch: OrderStepPatch,
 ): string | null {
   const updates = patch.steps ?? {};
-  if (updates.encoded === true) {
-    return "Encoding can only be recorded through the verified encoder result endpoint.";
-  }
 
   const nextStatus = patch.status ?? status;
   const nextSteps = { ...currentSteps, ...updates };
-  const gatedSteps = ["sanitize", "print", "laminate", "pack", "prepDone", "airplane", "tap", "text", "offline", "qc", "shipped"];
+  const gatedSteps = ["sanitize", "print", "laminate", "pack", "prepDone", "qcProfile", "qcProduct", "qcPackage", "qcOrder", "qc", "shipped"];
   if (nextStatus !== "paid" && gatedSteps.some((step) => updates[step] === true)) {
     return "Mark the order paid before starting production.";
   }
@@ -29,9 +26,8 @@ export function orderStepPatchError(
     return "Complete sanitize, print, laminate, and pack before marking preparation done.";
   }
 
-  if (nextSteps.qc &&
-      (!nextSteps.encoded || !["airplane", "tap", "text", "offline"].every((step) => nextSteps[step]))) {
-    return "Encode the tag and complete all QC checks before approving QC.";
+  if (nextSteps.qc && !["qcProfile", "qcProduct", "qcPackage", "qcOrder"].every((step) => nextSteps[step])) {
+    return "Complete all order quality checks before approving QC.";
   }
 
   if (nextSteps.shipped && !nextSteps.qc) {

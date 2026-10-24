@@ -5,8 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
 
 export default defineConfig(({ command, mode, isPreview }) => {
-  // Make .env values (STAFF_TOKEN, ENCODER_TOKEN, DATABASE_URL) visible to
-  // server routes during `vite dev`. Real environment variables still win.
+  // Make .env values visible to server routes during `vite dev`.
+  // Real environment variables still win.
   Object.assign(process.env, { ...loadEnv(mode, process.cwd(), ""), ...process.env });
 
   return {

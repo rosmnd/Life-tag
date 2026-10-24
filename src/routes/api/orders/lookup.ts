@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lookupOrder } from "@/lib/orders.server";
-import { json, tooMany } from "@/lib/staff-token.server";
+import { json, tooMany } from "@/lib/auth.server";
 
 export const Route = createFileRoute("/api/orders/lookup")({
   server: {

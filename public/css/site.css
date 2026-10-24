@@ -823,10 +823,26 @@ textarea { min-height: 96px; resize: vertical; }
 .scan-notes { margin: 16px 0 0; padding-left: 18px; color: var(--muted); display: grid; gap: 6px; }
 .scan-pick { margin-top: 16px; max-width: 320px; }
 
-.contact { margin-top: 18px; }
+.contact { margin-top: 12px; }
 .contact div { padding: 10px 0; border-top: 1px solid var(--line); }
 .contact dt { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pine); font-weight: 600; }
 .contact dd { margin: 2px 0 0; }
+.support-inquiry h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.support-inquiry-note,
+.support-privacy-note { color: var(--muted); }
+.support-inquiry-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.support-inquiry-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.support-inquiry-form textarea { resize: vertical; }
+.support-privacy-note { margin-top: 12px !important; }
 
 .desk {
   display: grid;
@@ -837,6 +853,8 @@ textarea { min-height: 96px; resize: vertical; }
 }
 
 .side {
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(175deg, #123d5a, #126d83 70%, #127c83);
   color: #e8f7f7;
   padding: 20px 14px;
@@ -873,6 +891,18 @@ textarea { min-height: 96px; resize: vertical; }
 
 .side-nav button.is-on { background: rgba(255, 255, 255, 0.17); color: white; }
 
+.side-logout {
+  margin-top: auto;
+  padding: 8px 2px;
+  border: 0;
+  background: none;
+  color: #fff;
+  text-align: left;
+  font-weight: 600;
+}
+
+.side-logout:hover { color: #d3f2f2; }
+
 .desk-main { padding: 22px 22px 40px; }
 
 .desk-top {
@@ -902,9 +932,13 @@ textarea { min-height: 96px; resize: vertical; }
 .status-new { background: #f6ecd4; color: var(--gold); }
 .status-paid, .status-ready { background: var(--mint); color: var(--ok); }
 .status-shipped { background: var(--forest); color: #f4f0e6; }
-.status-reencode { background: var(--warn-bg); color: var(--warn); }
 
 .panel { margin-top: 16px; }
+.orders-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.orders-panel-heading .hint { margin: 0; }
+.support-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.support-panel-heading .hint { margin-bottom: 0; }
+.ticket-message { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 220px; max-width: 480px; }
 
 table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 14px; overflow: hidden; }
 th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
@@ -985,17 +1019,27 @@ tr.is-active td { background: var(--mint-2); }
 .queue-card p { color: var(--muted); margin-top: 4px; }
 
 .foot {
-  width: min(1180px, calc(100% - 48px));
-  margin: 0 auto;
-  padding: 38px 0 72px;
+  width: 100%;
+  margin: 0;
+  padding: 12px max(24px, calc((100% - 1400px) / 2));
   display: flex;
+  justify-content: space-between;
   gap: 24px;
   align-items: center;
+  background: var(--paper);
 }
 
-.foot-logo { display: block; width: min(320px, 38%); height: auto; }
+.foot > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
 
-.foot p { color: var(--muted); max-width: 900px; font-size: clamp(1.1rem, 2.2vw, 1.75rem); }
+.foot-logo { display: block; width: min(320px, 24vw); height: auto; }
+
+.foot p { color: var(--muted); max-width: 720px; font-size: 0.95rem; }
+.foot-links { flex: none; }
+.foot-links button { padding: 8px 4px; color: var(--muted); font-size: 0.9rem; }
 .toast {
   position: fixed;
   left: 50%;
@@ -1054,7 +1098,11 @@ body:has(#view-staff:not([hidden])) .nav { display: none; }
   .side { position: sticky; top: 0; z-index: 15; }
   .side-nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
   .side-nav button { white-space: nowrap; }
-  .form-bar, .review-actions, .foot { flex-direction: column; align-items: stretch; }
+  .form-bar, .review-actions { flex-direction: column; align-items: stretch; }
+  .foot { padding: 16px 20px; }
+  .foot > div:first-child { gap: 16px; }
+  .foot-logo { width: min(180px, 35vw); }
+  .foot p { font-size: 0.8rem; }
   #view-order #step-form .form-bar { grid-template-columns: 1fr; }
   #view-order #step-form .form-bar-actions { flex-wrap: wrap; }
   .scan-stage { grid-template-columns: 1fr; min-height: 0; }
@@ -1082,12 +1130,18 @@ body:has(#view-staff:not([hidden])) .nav { display: none; }
   .scan-stage.is-tapped .phone { transform: none; }
 }
 
-/* Fulfillment desk: staff connection and NFC writer */
+/* Fulfillment desk and staff sign-in */
 .staff-connect { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 8px; }
 .staff-connect input { flex: 1 1 200px; max-width: 320px; }
 .staff-status { margin: 0 0 12px; min-height: 1.2em; }
-.staff-status.is-error, #encode-label.is-error { color: #a32d2d; }
+.staff-status.is-error { color: #a32d2d; }
+.staff-login-wrap { position: relative; display: grid; min-height: 100vh; place-items: center; padding: 64px 24px 24px; }
+.staff-back { position: absolute; top: 14px; left: 14px; display: inline-flex; min-width: 122px; min-height: 42px; align-items: center; gap: 10px; padding: 8px 16px; border: 1.5px solid var(--pine); border-radius: 999px; color: var(--forest); background: #fff; text-decoration: none; }
+.staff-back:hover { background: var(--mint); }
+.staff-login { display: grid; width: min(100%, 300px); justify-items: center; gap: 10px; }
+.staff-login-avatar { width: 100px; height: 100px; color: var(--pine); }
+#lifetag .staff-login h1 { margin: 0 0 2px; color: var(--pine); font: 600 1.1rem var(--sans); letter-spacing: 0; }
+#lifetag .staff-login input { width: 100%; min-height: 40px; padding: 8px 12px; border: 1.5px solid #526b79; border-radius: 999px; background: transparent; font-size: 0.9rem; }
+#lifetag .staff-login .btn { min-width: 112px; min-height: 40px; padding: 7px 20px; }
+.staff-login .staff-status { width: 100%; min-height: 0; margin: 0; text-align: center; }
 .hint.is-warn { color: #8a5a00; }
-.lock-row { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0; font-size: 0.9rem; }
-.lock-row input { margin-top: 3px; }
-#panel-encoding .actions { display: flex; gap: 8px; flex-wrap: wrap; }

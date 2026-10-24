@@ -69,7 +69,7 @@
         <p class="kicker">The problem</p>
         <h2>First responders should not have to guess.</h2>
         <p>In an emergency the person who needs care often cannot speak. Allergies, blood type, and who to call are the details that change the first minutes — and they are useless if they live only in a phone that is locked.</p>
-        <p>LifeTag writes those few lines onto the chip itself. The phone only reads what is already there.</p>
+        <p>The emergency details are stored as plain text on the tag. A compatible phone reads what is already there.</p>
       </div>
       <figure class="payload-card">
         <figcaption>What a tap shows</figcaption>
@@ -89,7 +89,7 @@
         <p class="kicker">Products</p>
         <h2>Choose your LifeTag</h2>
       </div>
-      <p class="section-note">One-time purchase. Re-encoding later is ₱20–₱30 if your details change.</p>
+      <p class="section-note">One-time purchase. Contact Support if you need help with your order.</p>
     </div>
     <div class="product-grid">
       <article class="product">
@@ -120,7 +120,7 @@
         <p class="product-name">Duo Active</p>
         <p class="price">₱99</p>
         <p class="product-kind">Card + sticker</p>
-        <p class="product-copy">Both formats, encoded with the same profile.</p>
+        <p class="product-copy">Both formats, made with the same profile.</p>
         <button class="btn btn-light" type="button" data-action="pick-product" data-product="duo">Select</button>
       </article>
     </div>
@@ -131,13 +131,13 @@
     <div class="after">
       <div>
         <p class="kicker">After you submit</p>
-        <h2>The chip is written once, by hand.</h2>
-        <p>The profile on the chip is static and cannot be updated online. You check the text, we encode that exact text, then test the tag in airplane mode before it leaves 12-B Alcalde Jose, Pasig.</p>
+        <h2>Review your emergency profile.</h2>
+        <p>The profile on the chip is static and cannot be updated online. Review the exact text carefully before submitting your order.</p>
       </div>
       <ol class="after-list">
         <li><span>1</span> You choose Lite, Pro, or Duo.</li>
         <li><span>2</span> You enter only emergency fields.</li>
-        <li><span>3</span> You confirm the text that will be burned in.</li>
+        <li><span>3</span> You confirm the profile details.</li>
         <li><span>4</span> A phone tap shows it, online or not.</li>
       </ol>
       <div class="after-actions">
@@ -151,10 +151,10 @@
     <h2>Your details and the tag</h2>
     <ul class="privacy-list">
       <li>We collect your name, blood type, emergency contact number, allergies or conditions, optional treatment directives, and order and payment-reference details.</li>
-      <li>We use these details to encode your tag and fulfill your order.</li>
+      <li>We use these details to prepare your tag profile and fulfill your order.</li>
       <li>The tag stores plain text. Anyone who taps it with a compatible phone can read the information on it.</li>
       <li>LifeTag is an emergency information aid, not a medical device.</li>
-      <li>To request correction or deletion of the server copy, contact us through Support. Information on the chip changes only if you return the physical tag for re-encoding.</li>
+      <li>To request correction or deletion of the server copy, contact us through Support. Information already stored on a tag cannot be changed through this website.</li>
     </ul>
     <p class="fine">Only submit details you want written on the tag and readable by anyone who taps it.</p>
   </section>
@@ -211,7 +211,7 @@
       <div class="terms-content">
         <section>
           <h3>What we collect and why</h3>
-          <p>We collect your name, blood type, emergency contact number, allergies or conditions, optional treatment directives, and order and payment-reference details. We use the emergency information to encode your tag and fulfill your order.</p>
+          <p>We collect your name, blood type, emergency contact number, allergies or conditions, optional treatment directives, and order and payment-reference details. We use the emergency information to prepare your tag and fulfill your order.</p>
         </section>
         <section>
           <h3>Information on the tag</h3>
@@ -219,12 +219,12 @@
         </section>
         <section>
           <h3>Correction and deletion</h3>
-          <p>To request correction or deletion of the server copy, contact us through the <a href="/support">Support page</a>. Information on the chip changes only if you return the physical tag for re-encoding.</p>
+          <p>To request correction or deletion of the server copy, contact us through the <a href="/support">Support page</a>. Information already stored on a tag cannot be changed through this website.</p>
         </section>
       </div>
       <label class="check-line terms-check">
         <input type="checkbox" id="terms-check" required />
-        I have read and consent to the collection and use of these details to encode my tag and fulfill my order. I understand the tag contains plain text readable by anyone who taps it, and LifeTag is not a medical device.
+        I have read and consent to the collection and use of these details to prepare my tag and fulfill my order. I understand the tag contains plain text readable by anyone who taps it, and LifeTag is not a medical device.
       </label>
       <div class="form-bar">
         <button class="btn btn-ghost" type="button" data-action="back-choose">Back to products</button>
@@ -263,7 +263,7 @@
       <p class="bytes" id="form-bytes" aria-live="polite">Profile: 0 / 120 bytes. NTAG213 capacity: 144 bytes; 24 bytes are reserved for NDEF framing.</p>
       <p class="form-error" id="form-error" hidden></p>
       <div class="form-bar">
-        <p>Only provide information you want encoded on your tag.</p>
+        <p>Only provide information you want included in your tag profile.</p>
         <div class="form-bar-actions">
           <button class="btn btn-ghost" type="button" data-action="fill-sample">Fill sample</button>
           <button class="btn btn-ghost" type="button" data-action="back-terms">Back</button>
@@ -282,7 +282,7 @@
       </dl>
       <pre class="review-payload" id="r-payload"></pre>
       <p class="bytes" id="review-bytes"></p>
-      <p class="warn">Chip memory can’t be edited online once written. A later change means sending the tag back for re-encoding (₱20–₱30).</p>
+      <p class="warn">Information stored on the chip is plain text and cannot be edited through this website.</p>
       <div class="review-actions">
         <label class="check-line">
           <input type="checkbox" id="confirm-check" />
@@ -323,7 +323,7 @@
       <pre id="done-payload"></pre>
       <div class="hero-actions">
         <button class="btn" type="button" data-action="go-scan">Preview the tap</button>
-        <button class="btn btn-ghost" type="button" data-action="go-support">Re-encoding later</button>
+        <button class="btn btn-ghost" type="button" data-action="go-support">Support</button>
         <button class="btn btn-ghost" type="button" data-action="go-home">Back home</button>
       </div>
       <p class="hint">Save the receipt code above. It is required to look up this order. A copy is saved in this browser for this order only.</p>
@@ -370,37 +370,41 @@
   <section class="section support-grid">
     <div>
       <p class="kicker">Support</p>
-      <h1>Tag re-encoding service</h1>
-      <p class="lede">For re-encoding or to request correction or deletion of the server copy, visit Support at 12-B Alcalde Jose, Pasig. The re-encoding fee is ₱20–₱30.</p>
+      <h1>How can we help?</h1>
+      <p class="lede">For help with an order or to request correction or deletion of the server copy, visit us at 12-B Alcalde Jose, Pasig.</p>
       <dl class="contact">
-        <div><dt>Re-encoding desk</dt><dd>12-B Alcalde Jose, Pasig</dd></div>
-        <div><dt>What to bring</dt><dd>The physical tag and your order ID and receipt code.</dd></div>
-        <div><dt>Bulk</dt><dd>Duo Active at ₱89 from 50 packs, subject to a cost check.</dd></div>
+        <div><dt>Order support</dt><dd>12-B Alcalde Jose, Pasig</dd></div>
+        <div><dt>What to bring</dt><dd>Your order ID and private receipt code.</dd></div>
       </dl>
     </div>
-    <form id="reencode-form" class="intake">
-      <p class="picked">Details changed? Re-encoding fee ₱20–₱30</p>
-      <div class="form-grid">
-        <label>Order ID
-          <input name="orderId" id="re-id" required placeholder="001" maxlength="8" />
-        </label>
-        <label class="span-2">Receipt code
-          <input name="receipt" id="re-receipt" required maxlength="64" autocomplete="off" />
-        </label>
-        <label>Option
-          <select name="option" id="re-option">
-            <option value="Re-encode my tag">Re-encode my tag</option>
-            <option value="Replace a lost tag">Replace a lost tag</option>
+    <div class="support-inquiry intake">
+      <p class="kicker">Send an inquiry</p>
+      <h2>Contact LifeTag Support</h2>
+      <p class="support-inquiry-note">Do not include emergency medical details or your private order receipt code.</p>
+      <form id="support-inquiry-form" class="support-inquiry-form">
+        <label>What do you need help with?
+          <select id="support-category" name="category" required>
+            <option value="general">General support</option>
+            <option value="reencode">RE-ENCODE request</option>
           </select>
         </label>
-      </div>
-      <p class="form-error" id="re-error" hidden></p>
-      <div class="form-bar">
-        <p>Bring the physical tag to 12-B Alcalde Jose, Pasig. We only update chip information when the tag is returned.</p>
-        <button class="btn" type="submit">Request re-encoding</button>
-      </div>
-      <p class="form-ok" id="re-ok" hidden></p>
-    </form>
+        <label>Your name
+          <input id="support-name" name="name" maxlength="80" autocomplete="name" required />
+        </label>
+        <label>Email
+          <input id="support-email" name="email" type="email" maxlength="254" autocomplete="email" required />
+        </label>
+        <label>Order ID (optional)
+          <input id="support-order-id" name="orderId" maxlength="32" />
+        </label>
+        <label>How can we help?
+          <textarea id="support-message" name="message" rows="5" maxlength="2000" required></textarea>
+        </label>
+        <button class="btn" type="submit">Send inquiry</button>
+        <p class="hint" id="support-inquiry-status" role="status" aria-live="polite"></p>
+      </form>
+      <p class="support-privacy-note">For privacy, keep your receipt code private and share it only with LifeTag support when needed.</p>
+    </div>
   </section>
 </main>
 
@@ -437,9 +441,7 @@
     <p>12-B Alcalde Jose, Pasig City. General partnership — Acebedo, Buncad, Bernardo, Palco.</p>
   </div>
   <div class="foot-links">
-    <button type="button" data-action="go-scan">Field scan</button>
-    <button type="button" data-action="go-support">Re-encode</button>
-    <button type="button" data-action="go-staff">Staff</button>
+    <button id="staff-footer-link" type="button" data-action="go-staff" hidden>Staff</button>
   </div>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

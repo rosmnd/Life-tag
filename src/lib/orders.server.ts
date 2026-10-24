@@ -9,10 +9,15 @@ export const PRODUCTS = ["lite", "pro", "duo"] as const;
 
 export const NewOrder = z.object({ product: z.enum(PRODUCTS) }).extend(OrderProfile.shape);
 
+const StaffOrderSteps = [
+  "sanitize", "print", "laminate", "pack", "prepDone", "qcProfile", "qcProduct",
+  "qcPackage", "qcOrder", "qc", "shipped", "generated",
+] as const;
+
 export const OrderPatch = z.object({
   status: z.enum(["new", "awaiting_payment", "paid"]).optional(),
   tracking: z.string().max(80).optional(),
-  steps: z.record(z.string(), z.boolean()).optional(),
+  steps: z.partialRecord(z.enum(StaffOrderSteps), z.boolean()).optional(),
 });
 
 export interface OrderRow {
@@ -25,11 +30,7 @@ export interface OrderRow {
   allergies: string;
   directives: string;
   tracking: string;
-  reencode: { option: string } | null;
   steps: Record<string, boolean>;
-  tag_uid: string | null;
-  encoded_via: string | null;
-  encoded_at: string | null;
   payment_reference: string | null;
   created: string;
 }
@@ -46,10 +47,7 @@ export function toClient(row: OrderRow) {
     allergies: row.allergies,
     directives: row.directives,
     tracking: row.tracking,
-    reencode: row.reencode,
     steps: row.steps,
-    tagUid: row.tag_uid,
-    encodedVia: row.encoded_via,
     created: row.created,
     paymentReference: row.payment_reference,
     payload: payloadOf(row),
@@ -82,8 +80,8 @@ export async function createOrder(input: z.infer<typeof NewOrder>): Promise<{ or
 export async function lookupOrder(id: string, receipt: string) {
   const sql = await getSql();
   const receiptHash = createHash("sha256").update(receipt).digest("hex");
-  const rows = await sql<Pick<OrderRow, "id" | "product" | "status" | "tracking" | "steps" | "reencode">>`
-    select id, product, status, tracking, steps, reencode from orders
+  const rows = await sql<Pick<OrderRow, "id" | "product" | "status" | "tracking" | "steps">>`
+    select id, product, status, tracking, steps from orders
     where id = ${id} and receipt_hash = ${receiptHash}`;
   const row = rows[0];
   if (!row) return null;
@@ -94,10 +92,8 @@ export async function lookupOrder(id: string, receipt: string) {
       : "Awaiting payment"
     : row.steps.shipped
       ? "Shipped"
-      : row.steps.encoded
-        ? "Encoding complete"
-        : row.reencode
-          ? "Re-encode requested"
+      : row.steps.qc
+        ? "Quality checked"
         : row.steps.prepDone
           ? "In production"
           : row.status === "paid"
@@ -110,10 +106,8 @@ export async function lookupOrder(id: string, receipt: string) {
     tracking: row.tracking,
     generated: !!row.steps.generated,
     prepDone: !!row.steps.prepDone,
-    encoded: !!row.steps.encoded,
     qc: !!row.steps.qc,
     shipped: !!row.steps.shipped,
-    reencodeRequested: !!row.reencode,
   };
 }
 
@@ -145,43 +139,5 @@ export async function patchOrder(id: string, patch: z.infer<typeof OrderPatch>):
       tracking = ${patch.tracking ?? current.tracking},
       steps    = ${JSON.stringify(steps)}::jsonb
     where id = ${id} returning *`;
-  return rows[0] ?? null;
-}
-
-export async function requestReencode(id: string, receipt: string, option: string): Promise<boolean> {
-  const sql = await getSql();
-  const receiptHash = createHash("sha256").update(receipt).digest("hex");
-  const rows = await sql`
-    update orders set
-      reencode = ${JSON.stringify({ option })}::jsonb,
-      steps = steps || jsonb_build_object(
-        'prepDone', true,
-        'shipped', false,
-        'encoded', false,
-        'qc', false
-      )
-    where id = ${id} and receipt_hash = ${receiptHash} and status = 'paid' returning id`;
-  return rows.length > 0;
-}
-
-/** Orders whose prep is done but whose chip has not been written yet. */
-export async function encodingQueue(): Promise<OrderRow[]> {
-  const sql = await getSql();
-  return sql<OrderRow>`
-    select * from orders
-    where status = 'paid'
-      and coalesce((steps->>'prepDone')::boolean, false)
-      and not coalesce((steps->>'encoded')::boolean, false)
-    order by created asc, id asc`;
-}
-
-export async function markEncoded(id: string, via: string, uid: string | null): Promise<OrderRow | null> {
-  const sql = await getSql();
-  const rows = await sql<OrderRow>`
-    update orders set
-      steps = steps || '{"encoded": true, "generated": true}'::jsonb,
-      tag_uid = ${uid}, encoded_via = ${via}, encoded_at = now()
-    where id = ${id} and status = 'paid'
-      and coalesce((steps->>'prepDone')::boolean, false) returning *`;
   return rows[0] ?? null;
 }

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { submitPaymentReference } from "@/lib/orders.server";
-import { json, tooMany } from "@/lib/staff-token.server";
+import { json, tooMany } from "@/lib/auth.server";
 
 const Body = z.object({
   receipt: z.string().min(32).max(64),
