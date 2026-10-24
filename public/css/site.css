@@ -220,6 +220,8 @@ body {
   max-width: 940px;
 }
 
+#view-order .section { padding-bottom: 24px; }
+
 .view:not([hidden]):not(#view-home):not(#view-staff) .intake,
 .view:not([hidden]):not(#view-home):not(#view-staff) .review {
   border-color: var(--line);
@@ -632,11 +634,44 @@ pre {
 
 .intake { padding: 18px; }
 
+.terms h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 14px; }
+
+.terms-notice {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.terms-content { display: grid; gap: 14px; margin-top: 16px; }
+.terms-content section { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.terms-content h3 { font-family: var(--sans); font-size: 1rem; letter-spacing: 0; }
+.terms-content p { color: var(--muted); margin-top: 4px; }
+
+.terms-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+.terms-check input { width: auto; min-height: 0; margin-top: 5px; flex: none; }
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+
+#view-order #step-form .form-grid { align-items: start; }
+
+#view-order #step-form .form-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+#view-order #step-form .form-bar-actions { flex-wrap: nowrap; }
 
 .form-grid label,
 .ship-note,
@@ -646,6 +681,8 @@ pre {
   font-size: 0.92rem;
   font-weight: 600;
 }
+
+.field-hint { color: var(--muted); font-size: 0.82rem; font-weight: 400; }
 
 .span-2 { grid-column: 1 / -1; }
 
@@ -1019,6 +1056,8 @@ body:has(#view-staff:not([hidden])) .nav { display: none; }
   .side-nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
   .side-nav button { white-space: nowrap; }
   .form-bar, .review-actions, .foot { flex-direction: column; align-items: stretch; }
+  #view-order #step-form .form-bar { grid-template-columns: 1fr; }
+  #view-order #step-form .form-bar-actions { flex-wrap: wrap; }
   .scan-stage { grid-template-columns: 1fr; min-height: 0; }
   .hero { padding: 30px 24px; margin-top: 16px; }
   .hero-photo { transform: none; }

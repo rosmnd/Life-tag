@@ -1,0 +1,130 @@
+<main id="view-staff" class="view">
+  <form id="staff-form" class="staff-connect">
+    <label class="sr-only" for="staff-token">Staff token</label>
+    <input id="staff-token" type="password" autocomplete="current-password" placeholder="Staff token" required />
+    <button class="btn" type="submit">Connect</button>
+    <p class="hint staff-status" id="staff-status" role="status"></p>
+  </form>
+  <div id="staff-content" hidden>
+    <div class="desk">
+    <aside class="side">
+      <div class="side-brand">
+        <img class="side-brand-logo" src="/images/lifetag-logo.png" alt="LifeTag" />
+      </div>
+      <nav class="side-nav" aria-label="Fulfillment">
+        <button type="button" data-action="staff-panel" data-panel="orders">Orders</button>
+        <button type="button" data-action="staff-panel" data-panel="payload">Payload</button>
+        <button type="button" data-action="staff-panel" data-panel="production">Production</button>
+        <button type="button" data-action="staff-panel" data-panel="encoding">Encoding</button>
+        <button type="button" data-action="staff-panel" data-panel="qc">QC</button>
+        <button type="button" data-action="staff-panel" data-panel="dispatch">Dispatch</button>
+        <button type="button" data-action="staff-panel" data-panel="support">Support</button>
+      </nav>
+    </aside>
+    <div class="desk-main">
+      <header class="desk-top">
+        <div>
+          <h1 id="desk-title">Order records</h1>
+          <p id="desk-sub">Chief Operating & Procurement Manager</p>
+        </div>
+        <div class="desk-tools">
+          <a class="btn btn-ghost" href="/">View site</a>
+          <span class="admin-pill">Admin</span>
+        </div>
+      </header>
+        <div id="staff-tools" class="staff-connect">
+          <button class="btn btn-ghost" type="button" data-action="staff-refresh">Refresh</button>
+          <button class="btn btn-ghost" type="button" data-action="staff-disconnect">Disconnect</button>
+        </div>
+        <p class="hint staff-status" id="staff-connected" role="status"></p>
+        <p class="working" id="working"></p>
+        <div id="staff-empty-state" class="empty-state" hidden>
+          <p>No customer orders are available yet. Create one through the customer checkout before starting fulfillment.</p>
+          <a class="btn" href="/order">Open customer order form</a>
+        </div>
+
+        <section id="panel-orders" class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Order</th><th>Product</th><th>Buyer</th><th>Payment reference</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody id="order-rows"></tbody>
+            </table>
+          </div>
+          <p class="hint">Open an order, then walk Payload → Production → Encoding → QC → Dispatch.</p>
+        </section>
+
+        <section id="panel-payload" class="panel" hidden>
+          <p class="panel-kicker" id="payload-kicker">Order</p>
+          <pre id="payload-pre"></pre>
+          <p class="hint" id="payload-meta">Plain text · no app or internet needed</p>
+          <div class="row-actions">
+            <button class="btn" type="button" data-action="generate-payload">Generate</button>
+            <button class="btn btn-ghost" type="button" data-action="copy-payload">Copy</button>
+          </div>
+        </section>
+
+        <section id="panel-production" class="panel" hidden>
+          <p class="panel-kicker" id="prod-kicker">Substrate prep</p>
+          <p class="hint payment-gate" id="payment-gate" hidden>Mark this order paid before starting production, encoding, QC, or dispatch.</p>
+          <div class="checks" id="prod-checks">
+            <button type="button" data-action="toggle-step" data-step="sanitize"><i></i>Sanitize card</button>
+            <button type="button" data-action="toggle-step" data-step="print"><i></i>Print LifeTag branding</button>
+            <button type="button" data-action="toggle-step" data-step="laminate"><i></i>Laminate</button>
+            <button type="button" data-action="toggle-step" data-step="pack"><i></i>Pack with user guide</button>
+          </div>
+          <button class="btn" type="button" data-action="mark-prep">Mark done</button>
+        </section>
+
+        <section id="panel-encoding" class="panel" hidden>
+          <p class="panel-kicker">Write with this phone</p>
+          <p class="hint" id="encode-support"></p>
+          <p id="encode-label" role="status">Ready to write.</p>
+          <div class="bar" aria-hidden="true"><span id="encode-bar"></span></div>
+          <p class="hint" id="encode-meta">Chip: NTAG213 · 144 bytes</p>
+          <label class="lock-row">
+            <input type="checkbox" id="encode-lock" />
+            <span>Lock the tag after writing. This cannot be undone, so re-encoding would need a new tag.</span>
+          </label>
+          <div class="actions">
+            <button class="btn" type="button" data-action="write-chip">Write to tag</button>
+            <button class="btn btn-ghost" type="button" data-action="cancel-write" hidden>Cancel</button>
+          </div>
+          <p class="hint">Many tags at once? Use the desktop encoder in <code>tools/encoder</code>.</p>
+        </section>
+
+        <section id="panel-qc" class="panel" hidden>
+          <p class="panel-kicker">Offline quality control</p>
+          <p class="hint">Test phone · Airplane Mode</p>
+          <div class="checks" id="qc-checks">
+            <button type="button" data-action="toggle-step" data-step="airplane"><i></i>Airplane Mode enabled</button>
+            <button type="button" data-action="toggle-step" data-step="tap"><i></i>Tap tag on test phone</button>
+            <button type="button" data-action="toggle-step" data-step="text"><i></i>Text renders instantly</button>
+            <button type="button" data-action="toggle-step" data-step="offline"><i></i>No app or data used</button>
+          </div>
+          <div class="row-actions">
+            <span class="pass" id="pass-pill" hidden>PASS</span>
+            <button class="btn" type="button" data-action="approve-qc">Approve</button>
+          </div>
+        </section>
+
+        <section id="panel-dispatch" class="panel" hidden>
+          <p class="panel-kicker" id="ship-kicker">Order dispatch</p>
+          <dl class="review" id="ship-facts"></dl>
+          <label class="ship-note">Tracking / handoff note
+            <input id="ship-note" maxlength="80" placeholder="Courier · pending" />
+          </label>
+          <button class="btn" type="button" data-action="mark-shipped">Mark as shipped</button>
+        </section>
+
+        <section id="panel-support" class="panel" hidden>
+          <p class="panel-kicker">Re-encoding queue</p>
+          <div id="re-queue"></div>
+          <a class="btn btn-ghost" href="/support">Open the customer form</a>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>

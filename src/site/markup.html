@@ -1,5 +1,5 @@
 <header class="nav">
-  <a class="brand" href="#top" data-action="go-home">
+  <a class="brand" href="/#top" data-action="go-home">
     <img class="brand-logo" src="/images/lifetag-logo.png" alt="LifeTag — Emergency Medical Tag" />
   </a>
   <button class="nav-toggle" type="button" data-action="nav-toggle" aria-expanded="false" aria-controls="nav-links">
@@ -7,10 +7,10 @@
     <span></span><span></span><span></span>
   </button>
   <nav id="nav-links" class="nav-links">
-    <a href="#products" data-action="go-products">Products</a>
-    <a href="#how" data-action="go-how">How it works</a>
-    <a href="#support" data-action="go-support">Support</a>
-    <a href="#desk" data-action="go-staff">Fulfillment</a>
+    <a href="/#products" data-action="go-products">Products</a>
+    <a href="/#how" data-action="go-how">How it works</a>
+    <a href="/support" data-action="go-support">Support</a>
+    <a href="/track" data-action="go-track">Track order</a>
     <button class="btn" type="button" data-action="go-order">Get LifeTag</button>
   </nav>
 </header>
@@ -20,7 +20,7 @@
     <div class="hero-copy">
       <p class="kicker">Tap. Know. Respond.</p>
       <h1>Your emergency info, one tap away.</h1>
-      <p class="lede">An NFC card and sticker that shows blood type and an ICE contact offline. No app. No account. No signal required.</p>
+      <p class="lede">An NFC card and sticker that shows blood type and an emergency contact offline. No app. No account. No signal required.</p>
       <div class="hero-actions">
         <button class="btn" type="button" data-action="go-order">Get LifeTag</button>
         <button class="btn btn-ghost" type="button" data-action="go-how">How it works</button>
@@ -28,7 +28,7 @@
       <ul class="trust">
         <li>Plain text on the chip</li>
         <li>From ₱39</li>
-        <li>Data Privacy Act · RA 10173</li>
+        <li>Emergency aid, not a medical device</li>
       </ul>
     </div>
     <div class="hero-art">
@@ -58,7 +58,7 @@
       <li>
         <span>03</span>
         <h3>Help starts</h3>
-        <p>Name, blood type, ICE contact, and allergies appear as plain text.</p>
+        <p>Name, blood type, emergency contact, and allergies appear as plain text.</p>
       </li>
     </ol>
   </section>
@@ -73,10 +73,10 @@
       </div>
       <figure class="payload-card">
         <figcaption>What a tap shows</figcaption>
-        <pre>LIFETAG EMERGENCY INFO
+        <pre>LIFETAG
 | NAME: Juan Dela Cruz
 | BLOOD: O+
-| ICE: 0917XXXXXXX
+| EMERGENCY CONTACT: 0917 123 4567
 | ALLERGIES: Penicillin</pre>
         <p>Standard plain text. No webpage behind it.</p>
       </figure>
@@ -132,7 +132,7 @@
       <div>
         <p class="kicker">After you submit</p>
         <h2>The chip is written once, by hand.</h2>
-        <p>There is no cloud profile to edit later. You check the text, we encode that exact text, then test the tag in airplane mode before it leaves 12-B Alcalde Jose, Pasig.</p>
+        <p>The profile on the chip is static and cannot be updated online. You check the text, we encode that exact text, then test the tag in airplane mode before it leaves 12-B Alcalde Jose, Pasig.</p>
       </div>
       <ol class="after-list">
         <li><span>1</span> You choose Lite, Pro, or Duo.</li>
@@ -142,31 +142,33 @@
       </ol>
       <div class="after-actions">
         <button class="btn" type="button" data-action="go-scan">Try a field tap</button>
-        <button class="btn btn-ghost" type="button" data-action="go-staff">Open the fulfillment desk</button>
       </div>
     </div>
   </section>
 
   <section class="section privacy">
     <p class="kicker">Privacy</p>
-    <h2>Only what a stranger needs in the first minute.</h2>
+    <h2>Your details and the tag</h2>
     <ul class="privacy-list">
-      <li>Collected: name, blood type, one ICE number, allergies or conditions, and an optional care note.</li>
-      <li>Not collected: address, government ID, medical history, photos, or accounts.</li>
-      <li>Stored on the chip as static NDEF text. This demo keeps a copy in your browser only — it is not sent to a server.</li>
+      <li>We collect your name, blood type, emergency contact number, allergies or conditions, optional treatment directives, and order and payment-reference details.</li>
+      <li>We use these details to encode your tag and fulfill your order.</li>
+      <li>The tag stores plain text. Anyone who taps it with a compatible phone can read the information on it.</li>
+      <li>LifeTag is an emergency information aid, not a medical device.</li>
+      <li>To request correction or deletion of the server copy, contact us through Support. Information on the chip changes only if you return the physical tag for re-encoding.</li>
     </ul>
-    <p class="fine">LifeTag is a student venture prototype from Pamantasan ng Lungsod ng Pasig, College of Computer Studies. It is a memory aid for responders, not a medical record and not a certified device.</p>
+    <p class="fine">Only submit details you want written on the tag and readable by anyone who taps it.</p>
   </section>
 </main>
 
 <main id="view-order" class="view" hidden>
   <section class="section wizard">
-    <p class="kicker">Free emergency registration</p>
+    <p class="kicker">Order LifeTag</p>
     <h1 id="wizard-title">Choose your LifeTag</h1>
     <ol class="crumbs" id="crumbs">
       <li data-crumb="1">Product</li>
-      <li data-crumb="2">Details</li>
-      <li data-crumb="3">Review</li>
+      <li data-crumb="2">Privacy &amp; terms</li>
+      <li data-crumb="3">Details</li>
+      <li data-crumb="4">Review</li>
     </ol>
 
     <div id="step-choose">
@@ -202,11 +204,40 @@
       </div>
     </div>
 
-    <form id="step-form" class="intake" hidden>
+    <section id="step-terms" class="intake terms" aria-labelledby="terms-title" hidden>
+      <p class="picked">Please read before entering profile details</p>
+      <h2 id="terms-title">Privacy, data protection &amp; terms</h2>
+      <p class="terms-notice">Please review how your information is used before continuing.</p>
+      <div class="terms-content">
+        <section>
+          <h3>What we collect and why</h3>
+          <p>We collect your name, blood type, emergency contact number, allergies or conditions, optional treatment directives, and order and payment-reference details. We use the emergency information to encode your tag and fulfill your order.</p>
+        </section>
+        <section>
+          <h3>Information on the tag</h3>
+          <p>The chip stores plain text. Anyone who taps the tag with a compatible phone can read the information on it. The tag is an emergency information aid, not a medical device.</p>
+        </section>
+        <section>
+          <h3>Correction and deletion</h3>
+          <p>To request correction or deletion of the server copy, contact us through the <a href="/support">Support page</a>. Information on the chip changes only if you return the physical tag for re-encoding.</p>
+        </section>
+      </div>
+      <label class="check-line terms-check">
+        <input type="checkbox" id="terms-check" required />
+        I have read and consent to the collection and use of these details to encode my tag and fulfill my order. I understand the tag contains plain text readable by anyone who taps it, and LifeTag is not a medical device.
+      </label>
+      <div class="form-bar">
+        <button class="btn btn-ghost" type="button" data-action="back-choose">Back to products</button>
+        <button class="btn" type="button" id="terms-continue" data-action="terms-continue" disabled>Continue to details</button>
+      </div>
+    </section>
+
+    <form id="step-form" class="intake" hidden novalidate>
       <p class="picked" id="picked-label"></p>
       <div class="form-grid">
-        <label>Full name
-          <input name="name" id="f-name" autocomplete="name" maxlength="40" required placeholder="Juan Dela Cruz" />
+        <label class="span-2">Full name
+          <input name="name" id="f-name" autocomplete="name" maxlength="40" required placeholder="Dela Cruz, Juan" aria-describedby="name-help" />
+          <span class="field-hint" id="name-help">Enter last name first, then first name. Example: Dela Cruz, Juan.</span>
         </label>
         <label>Blood type
           <select name="blood" id="f-blood" required>
@@ -218,23 +249,24 @@
             <option>Unknown</option>
           </select>
         </label>
-        <label>ICE contact
-          <input name="ice" id="f-ice" inputmode="tel" autocomplete="tel" maxlength="24" required placeholder="0917 XXX XXXX" />
+        <label>In case of emergency: contact number
+          <input name="ice" id="f-ice" type="tel" inputmode="numeric" autocomplete="tel" pattern="[0-9]{11}" required placeholder="09171234567" aria-describedby="ice-help" />
+          <span class="field-hint" id="ice-help">Enter exactly 11 digits. Letters and other characters are not allowed.</span>
         </label>
         <label>Allergies / conditions
           <input name="allergies" id="f-allergies" maxlength="48" required placeholder="Penicillin, or None" />
         </label>
-        <label class="span-2">Optional: religious directives on treatment
+        <label>Optional: religious directives on treatment
           <input name="directives" id="f-directives" maxlength="60" placeholder="Leave blank if none" />
         </label>
       </div>
-      <p class="bytes" id="form-bytes">Encoded text is measured before you submit. The chip is an NTAG213, 144 bytes.</p>
+      <p class="bytes" id="form-bytes" aria-live="polite">Profile: 0 / 120 bytes. NTAG213 capacity: 144 bytes; 24 bytes are reserved for NDEF framing.</p>
       <p class="form-error" id="form-error" hidden></p>
       <div class="form-bar">
-        <p>No address, government ID, or medical history is collected (RA 10173).</p>
+        <p>Only provide information you want encoded on your tag.</p>
         <div class="form-bar-actions">
           <button class="btn btn-ghost" type="button" data-action="fill-sample">Fill sample</button>
-          <button class="btn btn-ghost" type="button" data-action="back-choose">Back</button>
+          <button class="btn btn-ghost" type="button" data-action="back-terms">Back</button>
           <button class="btn" type="submit">Submit</button>
         </div>
       </div>
@@ -244,7 +276,7 @@
       <dl class="review">
         <div><dt>Name</dt><dd id="r-name"></dd></div>
         <div><dt>Blood</dt><dd id="r-blood"></dd></div>
-        <div><dt>ICE</dt><dd id="r-ice"></dd></div>
+        <div><dt>Emergency contact</dt><dd id="r-ice"></dd></div>
         <div><dt>Allergies</dt><dd id="r-allergies"></dd></div>
         <div id="r-note-row" hidden><dt>Note</dt><dd id="r-note"></dd></div>
       </dl>
@@ -261,18 +293,40 @@
           <button class="btn" type="button" id="btn-confirm" data-action="wizard-confirm" disabled>Confirm</button>
         </div>
       </div>
+      <p class="form-error" id="confirm-error" hidden></p>
     </div>
 
     <div id="step-done" hidden>
-      <p class="kicker">Order received</p>
+      <p class="kicker" id="done-status">Order received · awaiting payment</p>
       <h2 id="done-title">Order #000</h2>
       <p id="done-copy"></p>
+      <p class="price" id="done-amount"></p>
+      <p class="hint" id="done-local-status" hidden></p>
+      <section class="intake" aria-labelledby="payment-instructions-title">
+        <h2 id="payment-instructions-title">GCash / Maya payment instruction</h2>
+        <p id="payment-instructions">Loading payment details…</p>
+      </section>
+      <p class="picked">Private receipt code</p>
+      <pre id="done-receipt"></pre>
+      <form id="payment-reference-form" class="intake" novalidate>
+        <label>Payment reference
+          <input id="payment-reference" required maxlength="80" autocomplete="off" />
+        </label>
+        <p class="form-error" id="payment-reference-error" hidden></p>
+        <div class="form-bar">
+          <p id="payment-reference-help">Staff will check the reference and mark the order paid. No payment gateway is connected.</p>
+          <button class="btn" type="submit">Submit payment reference</button>
+        </div>
+        <p class="form-ok" id="payment-reference-ok" hidden></p>
+      </form>
+      <p class="kicker">Exact tag payload</p>
       <pre id="done-payload"></pre>
       <div class="hero-actions">
         <button class="btn" type="button" data-action="go-scan">Preview the tap</button>
         <button class="btn btn-ghost" type="button" data-action="go-support">Re-encoding later</button>
         <button class="btn btn-ghost" type="button" data-action="go-home">Back home</button>
       </div>
+      <p class="hint">Save the receipt code above. It is required to look up this order. A copy is saved in this browser for this order only.</p>
     </div>
   </section>
 </main>
@@ -280,12 +334,9 @@
 <main id="view-scan" class="view" hidden>
   <section class="section scan-layout">
     <div>
-      <p class="kicker">Field emergency scan</p>
+      <p class="kicker">Field scan preview</p>
       <h1>A responder taps. The text is already on the tag.</h1>
-      <p class="lede">Any NFC phone can read it. Airplane mode is fine. This preview uses the order you select — it does not talk to a chip.</p>
-      <label class="scan-pick">Preview tag for
-        <select id="scan-select"></select>
-      </label>
+      <p class="lede">Any NFC phone can read it. Airplane mode is fine. This preview shows sample text and does not talk to a chip.</p>
       <ul class="scan-notes">
         <li>No app is installed.</li>
         <li>No webpage is loaded.</li>
@@ -298,7 +349,7 @@
         <dl>
           <div><dt>Name</dt><dd id="phone-name">Juan Dela Cruz</dd></div>
           <div><dt>Blood</dt><dd id="phone-blood">O+</dd></div>
-          <div><dt>ICE</dt><dd id="phone-ice">0917XXXXXXX</dd></div>
+          <div><dt>Emergency contact</dt><dd id="phone-ice">0917 123 4567</dd></div>
           <div><dt>Allergies</dt><dd id="phone-allergies">Penicillin</dd></div>
         </dl>
       </div>
@@ -320,10 +371,10 @@
     <div>
       <p class="kicker">Support</p>
       <h1>Tag re-encoding service</h1>
-      <p class="lede">Details changed? The chip cannot be updated from this website. Return the tag and we rewrite it. Fee ₱20–₱30.</p>
+      <p class="lede">For re-encoding or to request correction or deletion of the server copy, visit Support at 12-B Alcalde Jose, Pasig. The re-encoding fee is ₱20–₱30.</p>
       <dl class="contact">
-        <div><dt>Desk</dt><dd>12-B Alcalde Jose, Pasig City 1600</dd></div>
-        <div><dt>What to bring</dt><dd>The physical card or sticker, plus your order ID.</dd></div>
+        <div><dt>Re-encoding desk</dt><dd>12-B Alcalde Jose, Pasig</dd></div>
+        <div><dt>What to bring</dt><dd>The physical tag and your order ID and receipt code.</dd></div>
         <div><dt>Bulk</dt><dd>Duo Active at ₱89 from 50 packs, subject to a cost check.</dd></div>
       </dl>
     </div>
@@ -333,19 +384,19 @@
         <label>Order ID
           <input name="orderId" id="re-id" required placeholder="001" maxlength="8" />
         </label>
+        <label class="span-2">Receipt code
+          <input name="receipt" id="re-receipt" required maxlength="64" autocomplete="off" />
+        </label>
         <label>Option
           <select name="option" id="re-option">
-            <option>Re-encode my tag</option>
-            <option>Replace a lost tag</option>
+            <option value="Re-encode my tag">Re-encode my tag</option>
+            <option value="Replace a lost tag">Replace a lost tag</option>
           </select>
-        </label>
-        <label class="span-2">Updated medical details
-          <textarea name="details" id="re-details" required maxlength="180" placeholder="New ICE number, allergy, or blood type"></textarea>
         </label>
       </div>
       <p class="form-error" id="re-error" hidden></p>
       <div class="form-bar">
-        <p>Then return your tag to be rewritten.</p>
+        <p>Bring the physical tag to 12-B Alcalde Jose, Pasig. We only update chip information when the tag is returned.</p>
         <button class="btn" type="submit">Request re-encoding</button>
       </div>
       <p class="form-ok" id="re-ok" hidden></p>
@@ -353,127 +404,31 @@
   </section>
 </main>
 
-<main id="view-staff" class="view" hidden>
-  <div class="desk">
-    <aside class="side">
-      <div class="side-brand">
-        <img class="side-brand-logo" src="/images/lifetag-logo.png" alt="LifeTag" />
-      </div>
-      <nav class="side-nav" aria-label="Fulfillment">
-        <button type="button" data-action="staff-panel" data-panel="orders">Orders</button>
-        <button type="button" data-action="staff-panel" data-panel="payload">Payload</button>
-        <button type="button" data-action="staff-panel" data-panel="production">Production</button>
-        <button type="button" data-action="staff-panel" data-panel="encoding">Encoding</button>
-        <button type="button" data-action="staff-panel" data-panel="qc">QC</button>
-        <button type="button" data-action="staff-panel" data-panel="dispatch">Dispatch</button>
-        <button type="button" data-action="staff-panel" data-panel="support">Support</button>
-      </nav>
-    </aside>
-    <div class="desk-main">
-      <header class="desk-top">
-        <div>
-          <h1 id="desk-title">Order records</h1>
-          <p id="desk-sub">Chief Operating & Procurement Manager</p>
-        </div>
-        <div class="desk-tools">
-          <button class="btn btn-ghost" type="button" data-action="go-home">View site</button>
-          <span class="admin-pill">Admin</span>
-        </div>
-      </header>
-      <form id="staff-form" class="staff-connect">
-        <label class="sr-only" for="staff-token">Staff token</label>
-        <input id="staff-token" type="password" autocomplete="current-password" placeholder="Staff token" />
-        <button class="btn" type="submit">Connect</button>
-      </form>
-      <div id="staff-tools" class="staff-connect" hidden>
-        <button class="btn btn-ghost" type="button" data-action="staff-refresh">Refresh</button>
-        <button class="btn btn-ghost" type="button" data-action="staff-disconnect">Disconnect</button>
-      </div>
-      <p class="hint staff-status" id="staff-status" role="status"></p>
-
-      <p class="working" id="working"></p>
-
-      <section id="panel-orders" class="panel">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Order</th><th>Product</th><th>Buyer</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody id="order-rows"></tbody>
-          </table>
-        </div>
-        <p class="hint">Open an order, then walk Payload → Production → Encoding → QC → Dispatch. This desk is a demo on this browser.</p>
-      </section>
-
-      <section id="panel-payload" class="panel" hidden>
-        <p class="panel-kicker" id="payload-kicker">Order</p>
-        <pre id="payload-pre"></pre>
-        <p class="hint" id="payload-meta">Plain text · no app or internet needed</p>
-        <div class="row-actions">
-          <button class="btn" type="button" data-action="generate-payload">Generate</button>
-          <button class="btn btn-ghost" type="button" data-action="copy-payload">Copy</button>
-        </div>
-      </section>
-
-      <section id="panel-production" class="panel" hidden>
-        <p class="panel-kicker" id="prod-kicker">Substrate prep</p>
-        <div class="checks" id="prod-checks">
-          <button type="button" data-action="toggle-step" data-step="sanitize"><i></i>Sanitize card</button>
-          <button type="button" data-action="toggle-step" data-step="print"><i></i>Print LifeTag branding</button>
-          <button type="button" data-action="toggle-step" data-step="laminate"><i></i>Laminate</button>
-          <button type="button" data-action="toggle-step" data-step="pack"><i></i>Pack with user guide</button>
-        </div>
-        <button class="btn" type="button" data-action="mark-prep">Mark done</button>
-      </section>
-
-      <section id="panel-encoding" class="panel" hidden>
-        <p class="panel-kicker">Write with this phone</p>
-        <p class="hint" id="encode-support"></p>
-        <p id="encode-label" role="status">Ready to write.</p>
-        <div class="bar" aria-hidden="true"><span id="encode-bar"></span></div>
-        <p class="hint" id="encode-meta">Chip: NTAG213 · 144 bytes</p>
-        <label class="lock-row">
-          <input type="checkbox" id="encode-lock" />
-          <span>Lock the tag after writing. This cannot be undone, so re-encoding would need a new tag.</span>
-        </label>
-        <div class="actions">
-          <button class="btn" type="button" data-action="write-chip">Write to tag</button>
-          <button class="btn btn-ghost" type="button" data-action="cancel-write" hidden>Cancel</button>
-        </div>
-        <p class="hint">Many tags at once? Use the desktop encoder in <code>tools/encoder</code>.</p>
-      </section>
-
-      <section id="panel-qc" class="panel" hidden>
-        <p class="panel-kicker">Offline quality control</p>
-        <p class="hint">Test phone · Airplane Mode</p>
-        <div class="checks" id="qc-checks">
-          <button type="button" data-action="toggle-step" data-step="airplane"><i></i>Airplane Mode enabled</button>
-          <button type="button" data-action="toggle-step" data-step="tap"><i></i>Tap tag on test phone</button>
-          <button type="button" data-action="toggle-step" data-step="text"><i></i>Text renders instantly</button>
-          <button type="button" data-action="toggle-step" data-step="offline"><i></i>No app or data used</button>
-        </div>
-        <div class="row-actions">
-          <span class="pass" id="pass-pill" hidden>PASS</span>
-          <button class="btn" type="button" data-action="approve-qc">Approve</button>
-        </div>
-      </section>
-
-      <section id="panel-dispatch" class="panel" hidden>
-        <p class="panel-kicker" id="ship-kicker">Order dispatch</p>
-        <dl class="review" id="ship-facts"></dl>
-        <label class="ship-note">Tracking / handoff note
-          <input id="ship-note" maxlength="80" placeholder="Courier · pending" />
-        </label>
-        <button class="btn" type="button" data-action="mark-shipped">Mark as shipped</button>
-      </section>
-
-      <section id="panel-support" class="panel" hidden>
-        <p class="panel-kicker">Re-encoding queue</p>
-        <div id="re-queue"></div>
-        <button class="btn btn-ghost" type="button" data-action="go-support">Open the customer form</button>
-      </section>
+<main id="view-track" class="view" hidden>
+  <section class="section support-grid">
+    <div>
+      <p class="kicker">Track order</p>
+      <h1>Look up your order</h1>
+      <p class="lede">Enter the order ID and the private receipt code shown after checkout. The receipt code keeps order details private.</p>
     </div>
-  </div>
+    <form id="track-form" class="intake">
+      <div class="form-grid">
+        <label>Order ID
+          <input id="track-id" required maxlength="24" placeholder="001" autocomplete="off" />
+        </label>
+        <label class="span-2">Receipt code
+          <input id="track-receipt" required maxlength="64" autocomplete="off" />
+        </label>
+      </div>
+      <p class="form-error" id="track-error" hidden></p>
+      <div class="form-bar">
+        <p>Only order status and dispatch information are shown.</p>
+        <button class="btn" type="submit">Look up order</button>
+      </div>
+      <div class="form-ok" id="track-result" hidden></div>
+      <dl class="review" id="track-status" hidden></dl>
+    </form>
+  </section>
 </main>
 
 <footer class="foot">
@@ -484,7 +439,7 @@
   <div class="foot-links">
     <button type="button" data-action="go-scan">Field scan</button>
     <button type="button" data-action="go-support">Re-encode</button>
-    <button type="button" data-action="go-staff">Fulfillment desk</button>
+    <button type="button" data-action="go-staff">Staff</button>
   </div>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
